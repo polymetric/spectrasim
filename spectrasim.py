@@ -31,10 +31,7 @@ def gausscurve(g, a, b, c):
 
 def color(hue, bright, sat):
     if (sat == 0): return np.full(nmcount, bright)
-    curve = gausscurve(gauss, 1, hue, 200/sat-199)
-#    curve = gausscurve(gauss, 1, hue, lerp(sat, endnm-startnm, 1))
-    curve /= curve.sum()
-    curve *= bright
+    curve = gausscurve(gauss, bright, hue, 200/sat-199)
     return curve;
 
 def lerp(x, a, b):
@@ -77,29 +74,42 @@ points_tgt = np.zeros((num_points, 3))
 outfile_src = open('src', 'w')
 outfile_tgt = open('tgt', 'w')
 
+### random gaussians test
 #for i in tqdm(range(num_points)):
-#    c = color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+##    c = color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+##    c -= color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+##    if random.random() < 1/3:
+##        c += color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+#    c = color(0, 1.0, 0)
+#    for j in range(10):
+#        c -= color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+#    c = c.clip(0, 1)
 #    points_src[i] = apply_observer(c, x_obs, y_obs, z_obs)
 #    points_tgt[i] = apply_observer(c, r_obs, g_obs, b_obs)
 #    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
 #    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
 
-# satch test
-#for h, s, b in tqdm(np.ndindex(nmcount, 100, 100)):
-#n=1000
-#colors = np.zeros((n,3))
-#sats = np.zeros((n))
-#lumas = np.zeros((n))
-#
-#for i in range(1, n):
-#    # sat var
-#    colors[i] = color_xyz(650, 1, i/n)
-#    lumas[i] = color(650, 1, i/n).sum()
-#for i in range(n):
-#    s = sat(colors[i])
-##    if s == 0: continue
-##    sats[i] = math.log(s,2)
-#    sats[i] = s
+### uniform test
+#i = 0
+#for h, s, b in tqdm(np.ndindex((13,13,13)), total=13**3):
+#    c = color(map(h, 0, 13, startnm, endnm), b/13, s/13)
+#    points_src[i] = apply_observer(c, x_obs, y_obs, z_obs)
+#    points_tgt[i] = apply_observer(c, r_obs, g_obs, b_obs)
+#    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
+#    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
+
+### random primaries test
+for i in tqdm(range(num_points)):
+    r=2**random.random()-1
+    g=2**random.random()-1
+    b=2**random.random()-1
+    c=color(650, r, 1) + color(550, g, 1) + color(450, b, 1)
+    points_src[i] = apply_observer(c, x_obs, y_obs, z_obs)
+    points_tgt[i] = apply_observer(c, r_obs, g_obs, b_obs)
+    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
+    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
+print(np.max(points_src))
+
 
 #### STATIC PLOT
 #fig, ax = plt.subplots()
@@ -113,37 +123,37 @@ outfile_tgt = open('tgt', 'w')
 #ax.legend()
 #plt.show()
 
-### ANIMATED PLOT
-fig, ax = plt.subplots()
-(lines,) = ax.plot(nms, color(700, 1, 0.01), scaley=False, animated=True)
-ax.grid()
-plt.show(block=False)
-
-plt.pause(0.1)
-bg = fig.canvas.copy_from_bbox(fig.bbox)
-ax.draw_artist(lines)
-fig.canvas.blit(fig.bbox)
-
-for i in range(1, 100000):
-#for i in nmrange:
-    fig.canvas.restore_region(bg)
-
-#    lines.set_ydata(color(700, 1, (100-i)/100))
-#    lines.set_ydata(color(i, 1, .5))
-
-    #colors[i] = color_xyz(650, 1, i/n)
-    c = color(lerp(random.random(), startnm, endnm), random.random(), random.random())
-    lines.set_ydata(c)
-#    print(i/n, sat(color_xyz(650,1,i/n)))
-    #print(colors[i])
-    #l = luma(colors[i])
-    #if l == 0: continue
-    #a = math.log(l,2)
-
-    ax.draw_artist(lines)
-    fig.canvas.blit(fig.bbox)
-    fig.canvas.flush_events()
-
-plt.pause(1);
+#### ANIMATED PLOT
+#fig, ax = plt.subplots()
+#(lines,) = ax.plot(nms, color(700, 1, 0.01), scaley=False, animated=True)
+#ax.grid()
+#plt.show(block=False)
+#
+#plt.pause(0.1)
+#bg = fig.canvas.copy_from_bbox(fig.bbox)
+#ax.draw_artist(lines)
+#fig.canvas.blit(fig.bbox)
+#
+#for i in range(1, 100000):
+##for i in nmrange:
+#    fig.canvas.restore_region(bg)
+#
+##    lines.set_ydata(color(700, 1, (100-i)/100))
+##    lines.set_ydata(color(i, 1, .5))
+#
+#    #colors[i] = color_xyz(650, 1, i/n)
+#    c = color(lerp(random.random(), startnm, endnm), random.random(), random.random())
+#    lines.set_ydata(c)
+##    print(i/n, sat(color_xyz(650,1,i/n)))
+#    #print(colors[i])
+#    #l = luma(colors[i])
+#    #if l == 0: continue
+#    #a = math.log(l,2)
+#
+#    ax.draw_artist(lines)
+#    fig.canvas.blit(fig.bbox)
+#    fig.canvas.flush_events()
+#
+#plt.pause(1);
 
 
