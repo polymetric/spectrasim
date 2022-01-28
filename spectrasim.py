@@ -180,24 +180,24 @@ points_tgt = np.zeros((num_points, 3))
 test1=[]
 
 ### random fixed monochromes test
-print('random fixed monochromes')
-outfile_src = open('random_fixed_monochromes_src', 'w')
-outfile_tgt = open('random_fixed_monochromes_tgt', 'w')
-random.seed(0)
-for i in tqdm(range(num_points)):
-    r=max(0, logc_decode(random.random()))
-    o=max(0, logc_decode(random.random()))
-    y=max(0, logc_decode(random.random()))
-    g=max(0, logc_decode(random.random()))
-    b=max(0, logc_decode(random.random()))
-    test1.append(logc_encode(r))
-    c=color(622+random.randint(-100, 100), r, 1) + color(605+random.randint(-100, 100), o, 1) + color(591+random.randint(-100, 100), y, 1) + color(568+random.randint(-100, 100), g, 1) + color(462+random.randint(-100, 100), b, 1)
-    c*=max(0, logc_decode(random.random()))
-
-    points_src[i] = logc_encode(apply_observer(c, x_obs, y_obs, z_obs))
-    points_tgt[i] = logc_encode(apply_observer(c, r_obs, g_obs, b_obs))
-    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
-    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
+#print('random fixed monochromes')
+#outfile_src = open('random_fixed_monochromes_src', 'w')
+#outfile_tgt = open('random_fixed_monochromes_tgt', 'w')
+#random.seed(0)
+#for i in tqdm(range(num_points)):
+#    r=max(0, logc_decode(random.random()))
+#    o=max(0, logc_decode(random.random()))
+#    y=max(0, logc_decode(random.random()))
+#    g=max(0, logc_decode(random.random()))
+#    b=max(0, logc_decode(random.random()))
+#    test1.append(logc_encode(r))
+#    c=color(622+random.randint(-100, 100), r, 1) + color(605+random.randint(-100, 100), o, 1) + color(591+random.randint(-100, 100), y, 1) + color(568+random.randint(-100, 100), g, 1) + color(462+random.randint(-100, 100), b, 1)
+#    c*=max(0, logc_decode(random.random()))
+#
+#    points_src[i] = logc_encode(apply_observer(c, x_obs, y_obs, z_obs))
+#    points_tgt[i] = logc_encode(apply_observer(c, r_obs, g_obs, b_obs))
+#    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
+#    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
 
 ### random shifting primaries test
 #print('random shifting primaries')
@@ -218,29 +218,29 @@ for i in tqdm(range(num_points)):
 test2=[]
 
 ### uniform fixed monochromes
-print('uniform fixed monochromes')
-outfile_src = open('uniform_fixed_monochromes_src', 'w')
-outfile_tgt = open('uniform_fixed_monochromes_tgt', 'w')
-pps=6
-num_points=pps**5
-points_src = np.zeros((num_points, 3))
-points_tgt = np.zeros((num_points, 3))
-random.seed(0)
-i = 0
-for r, o, y, g, b in tqdm(np.ndindex((pps,pps,pps,pps,pps)), total=pps**5):
-    r = max(0, logc_decode(map(r, 0, pps, 0, 1)))
-    o = max(0, logc_decode(map(o, 0, pps, 0, 1)))
-    y = max(0, logc_decode(map(y, 0, pps, 0, 1)))
-    g = max(0, logc_decode(map(g, 0, pps, 0, 1)))
-    b = max(0, logc_decode(map(b, 0, pps, 0, 1)))
-    test2.append(logc_encode(r))
-    c=color(622, r, 1) + color(605, o, 1) + color(591, y, 1) + color(568, g, 1) + color(462, b, 1)
-
-    points_src[i] = logc_encode(apply_observer(c, x_obs, y_obs, z_obs))
-    points_tgt[i] = logc_encode(apply_observer(c, r_obs, g_obs, b_obs))
-    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
-    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
-    i += 1
+#print('uniform fixed monochromes')
+#outfile_src = open('uniform_fixed_monochromes_src', 'w')
+#outfile_tgt = open('uniform_fixed_monochromes_tgt', 'w')
+#pps=6
+#num_points=pps**5
+#points_src = np.zeros((num_points, 3))
+#points_tgt = np.zeros((num_points, 3))
+#random.seed(0)
+#i = 0
+#for r, o, y, g, b in tqdm(np.ndindex((pps,pps,pps,pps,pps)), total=pps**5):
+#    r = max(0, logc_decode(map(r, 0, pps-1, 0, 1)))
+#    o = max(0, logc_decode(map(o, 0, pps-1, 0, 1)))
+#    y = max(0, logc_decode(map(y, 0, pps-1, 0, 1)))
+#    g = max(0, logc_decode(map(g, 0, pps-1, 0, 1)))
+#    b = max(0, logc_decode(map(b, 0, pps-1, 0, 1)))
+#    test2.append(logc_encode(r))
+#    c=color(622, r, 1) + color(605, o, 1) + color(591, y, 1) + color(568, g, 1) + color(462, b, 1)
+#
+#    points_src[i] = logc_encode(apply_observer(c, x_obs, y_obs, z_obs))
+#    points_tgt[i] = logc_encode(apply_observer(c, r_obs, g_obs, b_obs))
+#    outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
+#    outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
+#    i += 1
 
 ### uniform fixed primaries
 #print('uniform fixed primaries')
@@ -281,7 +281,7 @@ for r, o, y, g, b in tqdm(np.ndindex((pps,pps,pps,pps,pps)), total=pps**5):
 #    i += 1
 
 ### STATIC PLOT
-fig, ax = plt.subplots()
+#fig, ax = plt.subplots()
 
 
 
@@ -327,65 +327,69 @@ fig, ax = plt.subplots()
 #ax.plot(nms, sr, 'b', scaley=False)
 
 
-ax.hist(test1, color='r', bins=1000)
-ax.hist(test2, color='b', bins=1000)
 
-
-ax.grid()
-ax.legend()
-plt.show()
+#ax.grid()
+#ax.legend()
+#plt.show()
 
 
 ### ANIMATED PLOT
-#fig, ax = plt.subplots()
-#(line1,) = ax.plot(nms, color(0, 0, 0), 'r', scaley=False, animated=True)
-#(line2,) = ax.plot(nms, color(0, 0, 0), 'g', scaley=False, animated=True)
-#(line3,) = ax.plot(nms, color(0, 0, 0), 'b', scaley=False, animated=True)
-#(line4,) = ax.plot(nms, color(0, 0, 0), 'y', scaley=False, animated=True)
-#ax.grid()
-#ax.set_ylim(0, 2)
-#
-#i=startnm
-#
-#print('uniform fixed monochromes')
-#pps=6
-#num_points=pps**5
-#points_src = np.zeros((num_points, 3))
-#points_tgt = np.zeros((num_points, 3))
-#random.seed(0)
-#i = 0
-#it = np.ndindex((pps,pps,pps,pps,pps))
-#
-#def update(frame):
-#    global i
-##    s = color(i, 1, 1)
-##    c = apply_observer(s, x_obs, y_obs, z_obs)
-##    line1.set_data(nms, x_obs)
-##    line2.set_data(nms, y_obs)
-##    line3.set_data(nms, z_obs)
-##    line4.set_data(nms, s)
-##    print(f'{i:>8} {c[0]:>12.8f} {c[1]:>12.8f} {c[2]:>12.8f}')
-##    i+=1
-##    if i > endnm: i = startnm
-#    r,o,y,g,b = it.__next__()
-#    r = max(0, logc_decode(map(r, 0, pps, 0, 1)))
-#    o = max(0, logc_decode(map(o, 0, pps, 0, 1)))
-#    y = max(0, logc_decode(map(y, 0, pps, 0, 1)))
-#    g = max(0, logc_decode(map(g, 0, pps, 0, 1)))
-#    b = max(0, logc_decode(map(b, 0, pps, 0, 1)))
-#
+fig, ax = plt.subplots()
+figcolor, axcolor = plt.subplots()
+(line1,) = ax.plot(nms, color(0, 0, 0), 'y', scaley=False, animated=True)
+(line2,) = ax.plot(nms, color(0, 0, 0), 'r', scaley=False, animated=True)
+(line3,) = ax.plot(nms, color(0, 0, 0), 'g', scaley=False, animated=True)
+(line4,) = ax.plot(nms, color(0, 0, 0), 'b', scaley=False, animated=True)
+(line5,) = ax.plot(nms, color(0, 0, 0), 'r', scaley=False, animated=True)
+(line6,) = ax.plot(nms, color(0, 0, 0), 'g', scaley=False, animated=True)
+(line7,) = ax.plot(nms, color(0, 0, 0), 'b', scaley=False, animated=True)
+ax.grid()
+ax.set_ylim(0, 2)
+
+i=startnm
+
+print('uniform fixed monochromes')
+pps=6
+num_points=pps**5
+points_src = np.zeros((num_points, 3))
+points_tgt = np.zeros((num_points, 3))
+random.seed(0)
+i = 0
+it = np.ndindex((pps,pps,pps,pps,pps))
+
+def update(frame):
+    global i
+#    s = color(i, 1, 1)
+#    c = apply_observer(s, x_obs, y_obs, z_obs)
+#    line1.set_data(nms, x_obs)
+#    line2.set_data(nms, y_obs)
+#    line3.set_data(nms, z_obs)
+#    line4.set_data(nms, s)
+#    print(f'{i:>8} {c[0]:>12.8f} {c[1]:>12.8f} {c[2]:>12.8f}')
+#    i+=1
+#    if i > endnm: i = startnm
+    r,o,y,g,b = it.__next__()
+    r = max(0, logc_decode(map(r, 0, pps, 0, 1)))
+    o = max(0, logc_decode(map(o, 0, pps, 0, 1)))
+    y = max(0, logc_decode(map(y, 0, pps, 0, 1)))
+    g = max(0, logc_decode(map(g, 0, pps, 0, 1)))
+    b = max(0, logc_decode(map(b, 0, pps, 0, 1)))
+
 #    r = max(0, logc_decode(random.random()))
 #    o = max(0, logc_decode(random.random()))
 #    y = max(0, logc_decode(random.random()))
 #    g = max(0, logc_decode(random.random()))
 #    b = max(0, logc_decode(random.random()))
-#    c=color(622, r, 1) + color(605, o, 1) + color(591, y, 1) + color(568, g, 1) + color(462, b, 1)
-#
-#    line1.set_data(nms, c)
-#    print(logc_encode(apply_observer(c, x_obs, y_obs, z_obs)), logc_encode(apply_observer(c, r_obs, g_obs, b_obs)))
-#    i += 1
-#    return line1,line2,line3,line4,
-#
-#ani = FuncAnimation(fig, update, blit=True, interval=0)
-#plt.show()
+    c=color(622, r, 1) + color(605, o, 1) + color(591, y, 1) + color(568, g, 1) + color(462, b, 1)
+
+    line1.set_data(nms, c)
+    line2.set_data(nms, r_obs)
+    line3.set_data(nms, g_obs)
+    line4.set_data(nms, b_obs)
+    print(logc_encode(apply_observer(c, x_obs, y_obs, z_obs)), logc_encode(apply_observer(c, r_obs, g_obs, b_obs)))
+    i += 1
+    return line1,line2,line3,line4,line5,line6,line7
+
+ani = FuncAnimation(fig, update, blit=True, interval=100)
+plt.show()
 
