@@ -308,7 +308,7 @@ luma_interval = 1/3
 chroma_dim = 50
 chromas = []
 for r,g,b in np.ndindex((chroma_dim,chroma_dim,chroma_dim)):
-    if r+g+b == chroma_dim:
+    if r+g+b == chroma_dim-1:
         r/=chroma_dim-1
         g/=chroma_dim-1
         b/=chroma_dim-1

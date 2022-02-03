@@ -6,7 +6,7 @@ import math
 est=[]
 act=[]
 
-for j in range(60):
+for j in range(100):
     chroma_dim = j
     
     i=0
