@@ -99,6 +99,43 @@ def load_table(file):
         list.append(row)
     return np.array(list)
 
+# TODO vectorize?
+def matchtonemap(x, src, tgt):
+    if type(x) == np.ndarray:
+        for i in x.flat:
+            matchtonemap(i)
+        return x
+
+    i0=0
+    i1=0
+    if x <= src[0]:
+        if extrapolate:
+            i0=1
+            i1=2
+        else:
+            return src[0]
+    else:
+        for i in range(len(src)):
+            if i == len(src)-1:
+                if extrapolate:
+                    i0 = i-1
+                    i1 = i
+                    break
+                else:
+                    return tgt[i]
+
+            if src[i] <= x and x <= table_src[i+1]:
+                i0 = i
+                i1 = i+1
+                break
+    
+    x0 = src[i0]
+    x1 = src[i1]
+    y0 = tgt[i0]
+    y1 = tgt[i1]
+
+    return lerp(x, x0, y0, x1, y1)
+
 x_obs = 1.056*gausscurve(gauss_xyz, 599.8, 37.9, 31.0)+0.362*gausscurve(gauss_xyz, 442.0, 16.0, 26.7)-0.065*gausscurve(gauss_xyz, 501.1, 20.4, 26.2)
 y_obs = 0.812*gausscurve(gauss_xyz, 568.8, 46.9, 40.5)+0.286*gausscurve(gauss_xyz, 530.9, 16.3, 31.1)
 z_obs = 1.217*gausscurve(gauss_xyz, 437.0, 11.8, 36.0)+0.681*gausscurve(gauss_xyz, 459.0, 26.0, 13.8)
@@ -144,6 +181,33 @@ b_obs.align(colour.SpectralShape(startnm, endnm, interval), extrapolator=colour.
 r_obs = r_obs.values/1566.575376
 g_obs = g_obs.values/1566.575376
 b_obs = b_obs.values/1566.575376
+
+
+
+# load densities from file
+t=load_table('5219 dens.txt')
+y_dens = {}
+m_dens = {}
+c_dens = {}
+for nm, b in zip(range(380,731,10), t):
+    y_dens[nm] = b[0]
+    m_dens[nm] = b[1]
+    c_dens[nm] = b[2]
+y_dens = colour.SpectralDistribution(y_dens)
+m_dens = colour.SpectralDistribution(m_dens)
+c_dens = colour.SpectralDistribution(c_dens)
+
+ekw = {'method':'Constant', 'left':0, 'right':0}
+
+y_dens.align(colour.SpectralShape(startnm, endnm, interval), extrapolator=colour.Extrapolator, extrapolator_kwargs=ekw)
+m_dens.align(colour.SpectralShape(startnm, endnm, interval), extrapolator=colour.Extrapolator, extrapolator_kwargs=ekw)
+c_dens.align(colour.SpectralShape(startnm, endnm, interval), extrapolator=colour.Extrapolator, extrapolator_kwargs=ekw)
+
+y_dens = y_dens.values
+m_dens = m_dens.values
+c_dens = c_dens.values
+
+
 
 pps = 16
 #num_points = pps**3
@@ -325,12 +389,21 @@ for stop, chroma_i in tqdm(np.ndindex((stops*int(1/luma_interval),chromas.shape[
     r=chroma[0]
     g=chroma[1]
     b=chroma[2]
-    if r>=1 and b==0 and g==0: print('beef')
     c=color(630, r, 1) + color(532, g, 1) + color(467, b, 1)
     c *= 0.18*(2**(-(stop*luma_interval)+(stops/2)))
 
     points_src[i] = logc_encode(np.clip(apply_observer(c, x_obs, y_obs, z_obs), 0, None))
-    points_tgt[i] = logc_encode(np.clip(apply_observer(c, r_obs, g_obs, b_obs), 0, None))
+    #points_tgt[i] = np.clip(apply_observer(c, r_obs, g_obs, b_obs), 0, None)
+    # film emulation
+    c = np.clip(apply_observer(c, r_obs, g_obs, b_obs), 0, None)
+    c = matchtonemap(c, neg_curve_src, neg_curve_tgt)
+    s = np.full(nmcount, 1.0)
+    s *= (y_dens-1)*(1-np.clip(c[0], 0, 1))+1
+    s *= (m_dens-1)*(1-np.clip(c[1], 0, 1))+1
+    s *= (c_dens-1)*(1-np.clip(c[2], 0, 1))+1
+    c = logc_encode(np.clip(apply_observer(s, x_obs, y_obs, z_obs), 0, None)*2**-10)
+    points_tgt[i] = c
+    # end film emulation
     outfile_src.write(f'{points_src[i][0]} {points_src[i][1]} {points_src[i][2]}\n')
     outfile_tgt.write(f'{points_tgt[i][0]} {points_tgt[i][1]} {points_tgt[i][2]}\n')
     i += 1
@@ -502,4 +575,29 @@ for stop, chroma_i in tqdm(np.ndindex((stops*int(1/luma_interval),chromas.shape[
 #
 #ani = FuncAnimation(fig, update, blit=True, interval=100)
 #plt.show()
+
+#def plottest(x):
+#    sd = {}
+#    for nm, b in zip(range(startnm, endnm, interval), x):
+#        sd[nm] = b
+#    sd = colour.SpectralDistribution(sd)
+#    colour_style()
+#    plot_single_sd(sd)
+#
+## film emulation
+##c = np.array([1.0,0.0,0.0])
+#def test(c):
+#    s = np.full(nmcount, 1.0)
+#    s *= (y_dens-1)*(1-np.clip(c[0], 0, 1))+1
+#    s *= (m_dens-1)*(1-np.clip(c[1], 0, 1))+1
+#    s *= (c_dens-1)*(1-np.clip(c[2], 0, 1))+1
+#    c = logc_encode(np.clip(apply_observer(s, x_obs, y_obs, z_obs), 0, None))
+#    print(c)
+#    plottest(s)
+#test([1.0,0.0,0.0])
+#test([0.0,1.0,0.0])
+#test([0.0,0.0,1.0])
+#test([0.0,0.0,0.0])
+#test([1.0,1.0,1.0])
+# end film emulation
 
